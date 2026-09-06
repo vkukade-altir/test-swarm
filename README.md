@@ -19,18 +19,22 @@ A test only counts if removing that piece of app code would make the test fail.
 
 If the folder you have open is not a JS/TS git repo, look **one level down** for a folder with both `package.json` and `.git`. That is the app. Install there.
 
-No local skill yet (you only have this GitHub URL):
+Agents: read https://raw.githubusercontent.com/vkukade-altir/test-swarm/main/README.md (the GitHub page may not include this file).
+
+Safe to run twice (clears leftovers):
 
 ```bash
+rm -rf /tmp/test-swarm
 git clone --depth 1 https://github.com/vkukade-altir/test-swarm.git /tmp/test-swarm
 mkdir -p .cursor/skills .cursor/commands
+rm -rf .cursor/skills/test-swarm
 cp -R /tmp/test-swarm/skills/test-swarm .cursor/skills/test-swarm
 cp /tmp/test-swarm/skills/test-swarm/commands/test-swarm.md .cursor/commands/test-swarm.md
 ```
 
 Copy the **inner** `skills/test-swarm` folder, not this whole repo. Stay in the app. Then read `.cursor/skills/test-swarm/SKILL.md` and run.
 
-Claude Code: `/plugin marketplace add vkukade-altir/test-swarm` then `/plugin install test-swarm@test-swarm`. Same `cp` if that fails.
+Cursor: those commands. Claude Code can instead `/plugin marketplace add vkukade-altir/test-swarm` then `/plugin install test-swarm@test-swarm` — same `cp` if that fails.
 
 Needs Jest or Vitest already. Check that **after** install. No runner → stop; do not add packages.
 

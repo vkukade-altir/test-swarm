@@ -1,6 +1,6 @@
 # test-swarm
 
-Read and follow the test-swarm skill (`.cursor/skills/test-swarm/SKILL.md`, or `~/.cursor/skills/test-swarm/SKILL.md`). If that file is missing, follow the README install (GitHub URL → clone → copy inner `skills/test-swarm`), **then** read the skill.
+Read and follow the test-swarm skill (`.cursor/skills/test-swarm/SKILL.md`, or `~/.cursor/skills/test-swarm/SKILL.md`). If that file is missing, fetch https://raw.githubusercontent.com/vkukade-altir/test-swarm/main/README.md and run its install block (safe to re-run), **then** read the skill.
 
 If the workspace root is not a git repo, look one level down for `package.json` + `.git` and work there. Install first. Then ask the PR base branch. Then check for Jest/Vitest.
 

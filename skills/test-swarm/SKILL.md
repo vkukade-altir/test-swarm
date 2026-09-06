@@ -14,7 +14,7 @@ You are the **coordinator**. Subagents write tests. You do not write slice tests
 ## Order
 
 1. **Find the app.** If the workspace root is not a JS/TS git repo, look one level down for a folder with both `package.json` and `.git`. Work there. Do not stop at “not a git repo” on a parent folder.
-2. **Install.** If `.cursor/skills/test-swarm/SKILL.md` is missing (GitHub URL only): clone this pack to `/tmp`, copy inner `skills/test-swarm` → `.cursor/skills/test-swarm`, copy the command file, stay in the app, then continue. Do not `cd` into the clone.
+2. **Install.** If `.cursor/skills/test-swarm/SKILL.md` is missing, fetch https://raw.githubusercontent.com/vkukade-altir/test-swarm/main/README.md and run its install block (`rm -rf` the clone and dest first so a second run does not fail or nest the folder). Stay in the app. Do not `cd` into the clone.
 3. **Then** ask the base branch. **Then** check git + Jest/Vitest.
 
 Do not run the git/runner stop checks before install.
