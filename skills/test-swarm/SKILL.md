@@ -11,7 +11,13 @@ description: >-
 
 You are the **coordinator**. Subagents write tests. You do not write slice tests in this chat.
 
-Run this in the user's **app** repo (React or React Native). Figure everything out. Do not ask questions except the one below.
+## Order
+
+1. **Find the app.** If the workspace root is not a JS/TS git repo, look one level down for a folder with both `package.json` and `.git`. Work there. Do not stop at “not a git repo” on a parent folder.
+2. **Install.** If `.cursor/skills/test-swarm/SKILL.md` is missing (GitHub URL only): clone this pack to `/tmp`, copy inner `skills/test-swarm` → `.cursor/skills/test-swarm`, copy the command file, stay in the app, then continue. Do not `cd` into the clone.
+3. **Then** ask the base branch. **Then** check git + Jest/Vitest.
+
+Do not run the git/runner stop checks before install.
 
 ## The only question
 
@@ -21,7 +27,7 @@ Do not ask about the 95% floor, worker count, test runner, or what to skip.
 
 **Workers:** default **10**. If they named a count (`/test-swarm 20`, "use 4"), use that number. Always wins, including above 10. Do not cap. Do not ask.
 
-If this is not a JS/TS git repo, stop. If Jest **and** Vitest are missing from package.json / lockfile, **stop**. Do not add packages. Tell them this skill needs a test runner already in the repo. If `gh` cannot open PRs, still write tests and report local branches.
+After install: if this is still not a JS/TS git repo, stop. If Jest **and** Vitest are missing from package.json / lockfile, **stop**. Do not add packages. Tell them this skill needs a test runner already in the repo. If `gh` cannot open PRs, still write tests and report local branches.
 
 ## Keep the user informed
 
@@ -82,9 +88,7 @@ Paste into every spawn:
 
 ## Setup (once)
 
-If `.cursor/skills/test-swarm/SKILL.md` is missing in the **app** repo and you were given the GitHub URL: clone the pack to `/tmp`, copy `skills/test-swarm` → `.cursor/skills/test-swarm` (inner folder only), copy the command file, then continue here. Stay in the app repo.
-
-1. Skill dir = this pack (`skills/test-swarm` or `~/.cursor/skills/test-swarm` or `.cursor/skills/test-swarm`). Copy into the **app** repo:
+1. Skill dir = `.cursor/skills/test-swarm` or `~/.cursor/skills/test-swarm`. Copy scripts into the **app** repo:
 
 ```bash
 mkdir -p .test-swarm
