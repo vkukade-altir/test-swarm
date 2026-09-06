@@ -1,0 +1,11 @@
+{
+  "name": "test-swarm",
+  "description": "Parallel local agents write JS/TS tests in git worktrees until 95% line and branch coverage, then open PRs.",
+  "version": "1.0.0",
+  "author": {
+    "name": "vkukade-altir"
+  },
+  "license": "MIT",
+  "keywords": ["testing", "coverage", "jest", "vitest", "react", "react-native"],
+  "skills": ["./skills/test-swarm"]
+}

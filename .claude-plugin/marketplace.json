@@ -1,0 +1,24 @@
+{
+  "name": "test-swarm",
+  "id": "test-swarm",
+  "owner": {
+    "name": "vkukade-altir"
+  },
+  "metadata": {
+    "description": "Parallel local agents write JS/TS tests in git worktrees until 95% line and branch coverage",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "test-swarm",
+      "source": "./",
+      "description": "Parallel local agents write JS/TS tests until 95% lines and 95% branches, then open PRs",
+      "version": "1.0.0",
+      "author": {
+        "name": "vkukade-altir"
+      },
+      "keywords": ["testing", "coverage", "jest", "vitest"],
+      "category": "testing"
+    }
+  ]
+}

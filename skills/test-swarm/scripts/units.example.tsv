@@ -1,0 +1,2 @@
+id	state	branch	worktree	paths
+0	queued	test/swarm-0	../REPO-wt-0	src/example

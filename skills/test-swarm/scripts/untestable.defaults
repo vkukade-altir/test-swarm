@@ -1,0 +1,29 @@
+# Paths that do not count toward 95%. One glob per line. Coordinator extends this per repo.
+# Native / generated / data-only. Do not list app screens, hooks, or APIs here.
+
+ios/**
+android/**
+macos/**
+windows/**
+dist/**
+build/**
+coverage/**
+**/*.d.ts
+**/types.ts
+**/types.tsx
+**/*Types.ts
+**/*Types.tsx
+**/*.styles.ts
+**/*.styles.tsx
+**/*.style.ts
+**/*.style.tsx
+**/styles.ts
+**/styles.tsx
+**/theme/**
+**/themes/**
+**/locales/**
+**/i18n/locales/**
+**/constants/**
+**/generated/**
+**/*.generated.ts
+**/*.generated.tsx
