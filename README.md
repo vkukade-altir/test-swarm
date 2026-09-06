@@ -1,9 +1,12 @@
 # test-swarm
 
-AI agents write tests for your React or React Native app until almost all of the JavaScript actually ran in tests.
+AI agents write tests for your React or React Native app until the suite is thorough enough that **almost all of the JavaScript ran** — not only the happy tap.
 
-**95% of lines** — 95% of the code ran during tests.  
-**95% of branches** — 95% of the yes/no paths ran too (errors, empty states, disabled buttons), not only the happy tap.
+That bar is **95% of both**:
+
+- **Lines** — 95% of the code actually ran during tests.
+- **Branches** — 95% of the yes/no paths ran too (errors, empty states, disabled buttons).
+
 
 Run this **inside your app repo**, not inside this GitHub repo.
 
