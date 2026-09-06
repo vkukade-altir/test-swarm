@@ -51,3 +51,16 @@ Or copy [`CLAUDE.md`](CLAUDE.md) into the project.
 6. Opens PRs. Never merges. Never changes product behavior.
 
 A test only counts if deleting the production branch it names would make it fail.
+
+## React and React Native
+
+Both work. Same skill, same 95/95 gate on **app JS/TS**. Jest or Vitest unit and component tests — not browser E2E, not a real phone.
+
+**React (web)**  
+Pages, components, hooks, forms, store, API helpers. Clicks, empty/error states, routing. Network is mocked. Not Playwright/Cypress. Not CSS-only files.
+
+**React Native**  
+Screens, taps, hooks, navigation, session logic, store, API helpers. Confirm / Stop / Continue and the `if`s behind them. Native SDKs (camera, Face ID, payments) are mocked. Not `ios/` / `android/`. Not Face ID or permission system sheets. Not Detox/Maestro or driving the simulator.
+
+Styles, theme, locales, and generated types are skipped on both so the number stays honest.
+
