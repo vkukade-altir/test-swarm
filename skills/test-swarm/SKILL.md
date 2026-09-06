@@ -17,6 +17,8 @@ Ask which git branch to open PRs against. That is the **base**. Wait for the ans
 
 Do not ask about the 95% floor, worker count, test runner, or what to skip. Detect those.
 
+**Workers:** default **10**. If the user names a count in this chat (`/test-swarm 20`, "use 4", anything), use that number. Their number always wins, including above 10. Do not cap it. Do not ask.
+
 If this is not a JS/TS git repo, stop and say so. If `gh` cannot open PRs, still write tests and report local branches.
 
 ## Done
@@ -65,7 +67,7 @@ FLOOR=95
 WORKERS=10
 ```
 
-If the user named a worker count in the same message, use that number.
+WORKERS is 10 unless they already named a count — then write that number.
 
 3. Inspect the repo. Write `.test-swarm/untestable.globs` (one path per line, `#` comments ok). Start from `untestable.defaults` in this skill, then add what this repo cannot honestly unit-test (native passthroughs, generated files, Face ID / biometric OS sheets, widgets). Do **not** exclude app APIs, screens, or hooks just because they call a network or native SDK — mock the edge, keep the file in the score.
 
@@ -73,7 +75,7 @@ If the user named a worker count in the same message, use that number.
 
 ## Loop
 
-Default max **10** local workers. Paths must not overlap an in-flight unit.
+Max local workers = `WORKERS` in `.test-swarm/config` (10 unless they named another number). Paths must not overlap an in-flight unit.
 
 1. Run the existing test suite. If any suite fails, that is unit `0`: one worker, mocks/`jest.setup`/`vitest.setup` only, no product changes, until green. Open a PR. Do not merge. Continue.
 
