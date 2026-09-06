@@ -7,7 +7,7 @@ That bar is **95% of both**:
 - **Lines** — 95% of the code ran during tests.
 - **Branches** — 95% of the yes/no paths ran too (errors, empty states, disabled buttons).
 
-Run this in your **app** repo. `/test-swarm` or `Run test-swarm.` Optional: `/test-swarm 20` (default 10).
+Run this in your **app** repo. `/test-swarm` or `Run test-swarm.` Optional: `/test-swarm 20` to run 20 agents at once (default is 10).
 
 It asks which git branch to open PRs against. Then it splits the app, runs agents in parallel, and opens PRs. It does not merge. It does not change how the app works.
 
