@@ -27,9 +27,9 @@ If this is not a JS/TS git repo, stop. If Jest **and** Vitest are missing from p
 
 You are running this for the person who owns the product. After every spawn, every worker finish, every PR, every send-back, and at least whenever you are waiting on workers: one short update in product words.
 
-Example: "Login screens: tests in progress." / "Checkout: PR opened." / "Map: sent back — branches still short."
+Example: "Login screens: tests in progress." / "Checkout: PR opened." / "Settings: sent back — branches still short."
 
-Do not dump logs, file paths, or coverage JSON. Name the slice the way they would (login, wallet, settings).
+Do not dump logs, file paths, or coverage JSON. Name the slice the way they would (login, settings, home).
 
 ## Spawn (mandatory)
 

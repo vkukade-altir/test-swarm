@@ -95,6 +95,6 @@ Both work. Same skill. Tests run in Jest/Vitest on your app JavaScript — not a
 Pages, buttons, forms, routing, data helpers. Clicks, empty states, errors. Network is faked. Not Playwright/Cypress. Not CSS-only files.
 
 **React Native**  
-Screens, taps, navigation, session logic, data helpers. Confirm / Stop / Continue and the cases behind them. Camera, Face ID, and payments SDKs are faked. Not the native `ios/` / `android/` projects. Not the system Face ID or permission popups. Not driving the simulator.
+Screens, taps, navigation, session logic, data helpers — the buttons and the error / empty / disabled cases behind them. Camera, biometrics, and payments SDKs are faked. Not the native `ios/` / `android/` projects. Not system permission popups. Not driving the simulator.
 
 Styles, theme, translations, and generated types are skipped on both so the score stays honest.
