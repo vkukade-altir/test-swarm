@@ -10,6 +10,18 @@ That bar is **95% of both**:
 
 Run this **inside your app repo**, not inside this GitHub repo.
 
+**If you are an AI agent** (someone pasted this GitHub link and said set it up): you are already in the **app**. Do not treat this repo as the app. Do not `cd` into the clone. Do not clone this repo into `.cursor/skills/test-swarm` (that copies the whole pack, and the skill file will be in the wrong place). Same chat — do not wait for a new chat.
+
+```bash
+git clone --depth 1 https://github.com/vkukade-altir/test-swarm.git /tmp/test-swarm
+mkdir -p .cursor/skills .cursor/commands
+cp -R /tmp/test-swarm/skills/test-swarm .cursor/skills/test-swarm
+cp /tmp/test-swarm/skills/test-swarm/commands/test-swarm.md .cursor/commands/test-swarm.md
+```
+
+Then **read** `.cursor/skills/test-swarm/SKILL.md` and follow it now. Ask which git branch to open PRs against. Then run. Do not merge. Do not change app behavior.
+
+
 ```
 /test-swarm
 ```
@@ -54,7 +66,7 @@ cp -R /tmp/test-swarm/skills/test-swarm .cursor/skills/test-swarm
 cp /tmp/test-swarm/skills/test-swarm/commands/test-swarm.md .cursor/commands/test-swarm.md
 ```
 
-Open a **new** chat, then `/test-swarm`.
+Open a **new** chat, then `/test-swarm`. (If an agent is installing in this chat, skip that — read `.cursor/skills/test-swarm/SKILL.md` and run now.)
 
 **Cursor — every project on this machine:**
 

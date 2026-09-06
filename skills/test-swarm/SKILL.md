@@ -82,6 +82,8 @@ Paste into every spawn:
 
 ## Setup (once)
 
+If `.cursor/skills/test-swarm/SKILL.md` is missing in the **app** repo and you were given the GitHub URL: clone the pack to `/tmp`, copy `skills/test-swarm` → `.cursor/skills/test-swarm` (inner folder only), copy the command file, then continue here. Stay in the app repo.
+
 1. Skill dir = this pack (`skills/test-swarm` or `~/.cursor/skills/test-swarm` or `.cursor/skills/test-swarm`). Copy into the **app** repo:
 
 ```bash
