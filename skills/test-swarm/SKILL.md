@@ -44,7 +44,8 @@ If you cannot spawn subagents, **STOP** and tell the user. Do not silently write
 
 Never spawn two writers on the same `paths`.
 
-## Safety (even if the user auto-approves commands)
+## Safety
+
 
 Forbidden. If a worker does one of these, stop that worker.
 

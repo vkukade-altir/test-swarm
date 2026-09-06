@@ -31,13 +31,13 @@ If there is no test runner, the agent must **stop** and tell you. It must not si
 
 ## Safety
 
-The agent may have permission to run commands without asking. This skill still forbids:
+Extra limits:
 
-- Editing app behavior, screens, or native `ios/` `android/` projects
-- Merging PRs, force-push, `git reset --hard`, deleting your repo or `node_modules`
-- Touching `.env`, secrets, or production servers
-- Publishing packages, running `pod install` / Gradle as part of this skill
-- Working in your dirty main checkout (it uses separate copies next to your repo)
+- No editing app behavior, screens, or native `ios/` `android/` projects
+- No merging PRs, force-push, `git reset --hard`, or deleting your repo or `node_modules`
+- No touching `.env`, secrets, or production servers
+- No publishing packages, and no `pod install` / Gradle as part of this skill
+- No working in your dirty main checkout (it uses separate copies next to your repo)
 
 It **will** create folders named like `your-app-wt-login` next to your repo, write test files, `git push` those test branches, and open PRs. It will **not** merge them. You review.
 
