@@ -24,11 +24,30 @@ if [ -z "$line" ]; then
 fi
 branch="$(printf '%s\n' "$line" | awk -F'\t' '{print $3}')"
 worktree="$(printf '%s\n' "$line" | awk -F'\t' '{print $4}')"
-wt="$(python3 -c "import os; print(os.path.normpath(os.path.join('''$ROOT''', '''$worktree''')))")"
 cd "$ROOT"
+if [ "${worktree#/}" != "$worktree" ]; then
+  parent="$(dirname "$worktree")"
+  mkdir -p "$parent"
+  wt="$(cd "$parent" && pwd)/$(basename "$worktree")"
+else
+  parent="$(dirname "$ROOT/$worktree")"
+  mkdir -p "$parent"
+  wt="$(cd "$parent" && pwd)/$(basename "$worktree")"
+fi
+start_ref="$BASE"
+if ! git show-ref --verify --quiet "refs/heads/$BASE" && ! git rev-parse --verify --quiet "$BASE^{commit}" >/dev/null; then
+  if git show-ref --verify --quiet "refs/remotes/origin/$BASE"; then
+    start_ref="origin/$BASE"
+  else
+    git fetch origin "$BASE" --depth 1 2>/dev/null || true
+    if git show-ref --verify --quiet "refs/remotes/origin/$BASE"; then
+      start_ref="origin/$BASE"
+    fi
+  fi
+fi
 if [ -e "$wt/.git" ] || [ -f "$wt/.git" ]; then
-  if [ -z "$(git -C "$wt" status --porcelain)" ] && [ "$(git -C "$wt" rev-list --count "$BASE"..HEAD)" = "0" ]; then
-    git -C "$wt" merge --ff-only "$BASE"
+  if [ -z "$(git -C "$wt" status --porcelain)" ] && [ "$(git -C "$wt" rev-list --count "$start_ref"..HEAD 2>/dev/null || echo 1)" = "0" ]; then
+    git -C "$wt" merge --ff-only "$start_ref"
   fi
   mkdir -p "$wt/.test-swarm"
   cp -R "$SWARM/." "$wt/.test-swarm/"
@@ -38,7 +57,7 @@ fi
 if git show-ref --verify --quiet "refs/heads/$branch"; then
   git worktree add "$wt" "$branch"
 else
-  git worktree add -b "$branch" "$wt" "$BASE"
+  git worktree add -b "$branch" "$wt" "$start_ref"
 fi
 if [ -d "$ROOT/node_modules" ]; then
   ln -sfn "$ROOT/node_modules" "$wt/node_modules"

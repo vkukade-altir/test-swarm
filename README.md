@@ -1,34 +1,48 @@
 # test-swarm
 
-AI agents write tests for your React or React Native app until almost all of the JavaScript is actually exercised.
+AI agents write tests for your React or React Native app until almost all of the JavaScript actually ran in tests.
 
-**95% of lines** means 95% of the code ran during tests.  
-**95% of branches** means 95% of the yes/no paths ran too — not just the happy tap, but the error, empty, and disabled cases.
+**95% of lines** — 95% of the code ran during tests.  
+**95% of branches** — 95% of the yes/no paths ran too (errors, empty states, disabled buttons), not only the happy tap.
 
-You install this once. Then in your repo:
+Run this **inside your app repo**, not inside this GitHub repo.
 
 ```
 /test-swarm
 ```
 
-or `Run test-swarm.` Optional: `/test-swarm 20` to run 20 agents. Default is 10. Whatever number you type wins.
+or say `Run test-swarm.` Optional: `/test-swarm 20` for 20 agents. Default is 10. Whatever number you type wins.
 
-The agent asks **one** thing: which git branch to open PRs against. Then it measures what is untested, splits the app into slices, runs agents in parallel (each on its own copy of the repo), and opens one PR per slice. It does not merge. It does not change how the app works.
+It asks **one** thing: which git branch to open PRs against. Then it measures what is untested, splits the app into slices, and runs agents in parallel (each on its own copy of the repo). You get PRs. It does **not** merge. It does **not** change how the app works.
 
 A test only counts if removing that piece of app code would make the test fail.
 
+## You need
+
+- A React or React Native git repo (JavaScript or TypeScript)
+- **Jest or Vitest already in the project** (this skill will not add packages)
+- Cursor or Claude Code, with permission to spawn **subagents**
+- Optional: `gh` logged in, if you want PRs on GitHub
+
+If there is no test runner, the agent must **stop** and tell you. It must not silently install software.
+
+## Safety
+
+The agent may have permission to run commands without asking. This skill still forbids:
+
+- Editing app behavior, screens, or native `ios/` `android/` projects
+- Merging PRs, force-push, `git reset --hard`, deleting your repo or `node_modules`
+- Touching `.env`, secrets, or production servers
+- Publishing packages, running `pod install` / Gradle as part of this skill
+- Working in your dirty main checkout (it uses separate copies next to your repo)
+
+It **will** create folders named like `your-app-wt-login` next to your repo, write test files, `git push` those test branches, and open PRs. It will **not** merge them. You review.
+
 ## Install
 
-**Cursor**
+**Cursor — this project** (slash command `/test-swarm` works here):
 
-```bash
-git clone --depth 1 https://github.com/vkukade-altir/test-swarm.git ~/.cursor/skills/test-swarm-src
-cp -R ~/.cursor/skills/test-swarm-src/skills/test-swarm ~/.cursor/skills/test-swarm
-mkdir -p ~/.cursor/commands
-cp ~/.cursor/skills/test-swarm/commands/test-swarm.md ~/.cursor/commands/test-swarm.md
-```
-
-For a project (teammates get `/test-swarm`), from the JS/TS repo:
+From your **app** repo:
 
 ```bash
 git clone --depth 1 https://github.com/vkukade-altir/test-swarm.git /tmp/test-swarm
@@ -37,6 +51,17 @@ cp -R /tmp/test-swarm/skills/test-swarm .cursor/skills/test-swarm
 cp /tmp/test-swarm/skills/test-swarm/commands/test-swarm.md .cursor/commands/test-swarm.md
 ```
 
+Open a **new** chat, then `/test-swarm`.
+
+**Cursor — every project on this machine:**
+
+```bash
+git clone --depth 1 https://github.com/vkukade-altir/test-swarm.git ~/.cursor/skills/test-swarm-src
+cp -R ~/.cursor/skills/test-swarm-src/skills/test-swarm ~/.cursor/skills/test-swarm
+```
+
+Then say `Run test-swarm` in any app repo (slash `/test-swarm` still needs the project copy of the command file above).
+
 **Claude Code**
 
 ```
@@ -44,15 +69,19 @@ cp /tmp/test-swarm/skills/test-swarm/commands/test-swarm.md .cursor/commands/tes
 /plugin install test-swarm@test-swarm
 ```
 
-Or copy [`CLAUDE.md`](CLAUDE.md) into the project.
+If that fails, from your app repo run the same `cp` commands as Cursor project install, then say `Run test-swarm`.
 
-## What it does
+**Or paste this to any agent in your app repo**
+
+> Clone https://github.com/vkukade-altir/test-swarm, copy `skills/test-swarm` into `.cursor/skills/test-swarm` and the command file into `.cursor/commands/test-swarm.md`, read that skill, then run test-swarm. Do not change app behavior. Do not merge.
+
+## What happens
 
 1. Asks which branch PRs should target.
-2. Finds your package manager and test runner (Jest or Vitest).
-3. Fixes a red test suite first if needed (test setup only — no app behavior changes).
-4. Skips native OS UI, generated files, and data-only files so the 95% is honest.
-5. Runs local agents on separate folders (10 unless you named another count). Each folder must hit 95% of lines and 95% of yes/no paths.
+2. Finds yarn/npm/pnpm and Jest or Vitest. Stops if neither test runner exists.
+3. If today’s tests are already red, it fixes **test setup** only, then continues.
+4. Skips native OS UI, generated files, and data-only files so 95% stays honest.
+5. Starts parallel subagents on separate folders. The main agent is the coordinator: it must spawn those workers, not write all tests itself. It tells you what each worker is doing as it goes.
 6. Opens PRs. Never merges. Never changes product behavior.
 
 ## React and React Native

@@ -3,49 +3,85 @@ name: test-swarm
 description: >-
   Runs parallel local agents in git worktrees that write JS/TS tests until 95%
   lines and 95% branches, then opens one PR per slice. Use when the user says
-  test-swarm, 95% coverage, coverage swarm, or asks to raise test coverage with
-  parallel agents. Supports Jest and Vitest. React and React Native included.
+  test-swarm, /test-swarm, 95% coverage, coverage swarm, or asks to raise test
+  coverage with parallel agents. Supports Jest and Vitest. React and React Native.
 ---
 
 # test-swarm
 
-You are the coordinator. Run this in the user's JS/TS repo (React / React Native included). Figure everything out. Do not ask questions except the one below.
+You are the **coordinator**. Subagents write tests. You do not write slice tests in this chat.
+
+Run this in the user's **app** repo (React or React Native). Figure everything out. Do not ask questions except the one below.
 
 ## The only question
 
 Ask which git branch to open PRs against. That is the **base**. Wait for the answer. Then go.
 
-Do not ask about the 95% floor, worker count, test runner, or what to skip. Detect those.
+Do not ask about the 95% floor, worker count, test runner, or what to skip.
 
-**Workers:** default **10**. If the user names a count in this chat (`/test-swarm 20`, "use 4", anything), use that number. Their number always wins, including above 10. Do not cap it. Do not ask.
+**Workers:** default **10**. If they named a count (`/test-swarm 20`, "use 4"), use that number. Always wins, including above 10. Do not cap. Do not ask.
 
-If this is not a JS/TS git repo, stop and say so. If `gh` cannot open PRs, still write tests and report local branches.
+If this is not a JS/TS git repo, stop. If Jest **and** Vitest are missing from package.json / lockfile, **stop**. Do not add packages. Tell them this skill needs a test runner already in the repo. If `gh` cannot open PRs, still write tests and report local branches.
+
+## Keep the user informed
+
+You are running this for the person who owns the product. After every spawn, every worker finish, every PR, every send-back, and at least whenever you are waiting on workers: one short update in product words.
+
+Example: "Login screens: tests in progress." / "Checkout: PR opened." / "Map: sent back — branches still short."
+
+Do not dump logs, file paths, or coverage JSON. Name the slice the way they would (login, wallet, settings).
+
+## Spawn (mandatory)
+
+For each claimed unit you **must** spawn a **local** subagent:
+
+- Cursor: Task tool, `subagent_type` `generalPurpose`, `run_in_background` true, **omit** `model` (inherit parent). Never `cloud`.
+- Claude Code: the environment's Agent/Task tool, **same model as you**, local, not a lighter stand-in.
+
+Prompt = `.test-swarm/worker.md` filled in + standing orders below.
+
+If you cannot spawn subagents, **STOP** and tell the user. Do not silently write every folder in this one chat (overlapping edits, easy to touch the live checkout).
+
+Never spawn two writers on the same `paths`.
+
+## Safety (even if the user auto-approves commands)
+
+Forbidden. If a worker does one of these, stop that worker.
+
+- Change product behavior, screens, native `ios/` `android/`, or app config
+- Merge PRs, `git push --force`, `--no-verify`, `git reset --hard`, `git checkout --` of product files, `git clean`
+- Delete the repo, `rm -rf node_modules` in the **main** checkout, `rm -rf` the user's home
+- Read or write `.env`, credentials, keystores, secrets
+- `npm publish`, `pod install`, Gradle, Fastlane, store submit
+- Hit real production APIs; mock network
+- Cloud agents
+- `istanbul ignore` / `v8 ignore` / lowering the 95% floor
+- Stage or commit the user's **pre-existing** dirty files in the main checkout
+- Work in the user's current checkout except writing `.test-swarm/` and reading coverage. Tests go in worktrees.
+
+Do not raise the project's global `coverageThreshold`. The gate is this program.
 
 ## Done
 
-`node .test-swarm/coverage-gate.cjs` exits 0 after a full coverage run.
-
-That is **95% lines and 95% branches** on testable app JS/TS (denylist in `.test-swarm/untestable.globs`). Do not lower the floors. Do not `istanbul ignore` (or `v8 ignore`) to pass. Do not raise the project's global `coverageThreshold` — the gate is this program.
-
-Never merge. Never `git push --force`. Never `--no-verify`. Never change product behavior. Tests only.
+`node .test-swarm/coverage-gate.cjs` exits 0 after a full coverage run = **95% lines and 95% branches** on testable app JS/TS (`.test-swarm/untestable.globs`).
 
 ## Standing orders (every worker)
 
 Paste into every spawn:
 
 1. Branch off the base. Never merge, rebase, or cherry-pick into it.
-2. PRs use `--base <base>`. Do not merge the PR.
-3. Local worktree only. No cloud agents. Inherit the parent model. Do not pass a cheaper model.
-4. Write only tests under your unit `paths`. Test helpers only. No product edits.
+2. PRs use `--base <base>`. Do not merge.
+3. Local worktree only. Inherit parent model. No cloud. No cheaper model.
+4. Tests only under your `paths`. Test helpers only. No product edits.
 5. A test is valid only if removing the production branch under test would make it fail. No mock of the file under test. No "renders correctly" as the only assertion. No import-only coverage.
-6. Match existing test style. Mock native SDKs (camera, biometrics, payments sheets). Do not drive OS UI.
-7. Your glob must reach **95% lines and 95% branches** (minus `untestable.globs`). Iterate until it does.
-8. If you need a product change to test something, skip it and report. Do not patch production to make the test easy.
-9. Forbidden: force push, `--no-verify`, merge into base, editing another unit's paths, coverage ignore comments.
+6. Match existing test style. React web: `@testing-library/react` if present, else the repo's pattern. React Native: `@testing-library/react-native` or `react-test-renderer` if present. Mock native SDKs. Do not drive OS UI or a simulator.
+7. Your glob must reach **95% lines and 95% branches** (minus untestable). Iterate until it does.
+8. If you need a product change to test something, skip it and report. Do not patch production.
+9. Push only your test branch. Forbidden: force push, `--no-verify`, merge, other units' paths, coverage ignore, `.env`, deleting `node_modules` on the main repo.
 
 ## Setup (once)
 
-1. Find this skill directory (repo `skills/test-swarm` or `~/.cursor/skills/test-swarm`). Copy `scripts/` into the project:
+1. Skill dir = this pack (`skills/test-swarm` or `~/.cursor/skills/test-swarm` or `.cursor/skills/test-swarm`). Copy into the **app** repo:
 
 ```bash
 mkdir -p .test-swarm
@@ -54,37 +90,38 @@ cp "<skill>/untestable.defaults" .test-swarm/untestable.defaults
 chmod +x .test-swarm/claim-slice.sh
 ```
 
-`.test-swarm/units.tsv` columns (tab-separated): `id`, `state`, `branch`, `worktree`, `paths`. Example: `.test-swarm/units.example.tsv`.
+`units.tsv` columns (tab): `id`, `state`, `branch`, `worktree`, `paths`. See `units.example.tsv`.
 
-2. Detect package manager (`yarn.lock` / `pnpm-lock.yaml` / `package-lock.json`). Detect runner: Jest if `jest.config.*` or `jest` in package.json, else Vitest if `vitest.config.*` or `vitest` in package.json. Detect source root: `src/`, else `app/`, else first app package under `packages/`. Write `.test-swarm/config`:
+2. Detect `yarn` / `npm` / `pnpm`. Detect Jest vs Vitest. Detect React Native (`react-native` in package.json) vs React web. Source root: `src/`, else `app/`, else first app package under `packages/`. Write `.test-swarm/config`:
 
 ```
-BASE=<the branch they named>
+BASE=<branch they named>
 SRC=<source root>
 RUNNER=jest|vitest
 PM=yarn|npm|pnpm
+KIND=react|react-native
 FLOOR=95
 WORKERS=10
 ```
 
-WORKERS is 10 unless they already named a count — then write that number.
+3. Write `.test-swarm/untestable.globs` from `untestable.defaults`, plus this repo's honest skip list (native passthroughs, generated, biometric OS sheets, widgets). Do **not** exclude app APIs, screens, or hooks because they call a network or SDK — mock the edge.
 
-3. Inspect the repo. Write `.test-swarm/untestable.globs` (one path per line, `#` comments ok). Start from `untestable.defaults` in this skill, then add what this repo cannot honestly unit-test (native passthroughs, generated files, Face ID / biometric OS sheets, widgets). Do **not** exclude app APIs, screens, or hooks just because they call a network or native SDK — mock the edge, keep the file in the score.
+4. If `BASE` is not a local ref: `git fetch origin <BASE>` and use `origin/<BASE>` for worktree create. Do not checkout it in the user's dirty tree.
 
-4. Do not commit `.test-swarm/` unless a worker needs a file in git. Scripts are copied into each worktree by `claim-slice.sh`.
+5. Do not commit `.test-swarm/` unless needed. `claim-slice.sh` copies it into each worktree.
 
 ## Loop
 
-Max local workers = `WORKERS` in `.test-swarm/config` (10 unless they named another number). Paths must not overlap an in-flight unit.
+Max workers = `WORKERS`. No overlapping in-flight paths.
 
-1. Run the existing test suite. If any suite fails, that is unit `0`: one worker, mocks/`jest.setup`/`vitest.setup` only, no product changes, until green. Open a PR. Do not merge. Continue.
+1. Run the existing suite once. If it fails, unit `0`: **one** worker, mocks/setup files only, no product changes, until green. PR. Do not merge. Continue. If there are zero tests, skip this — go to coverage with `collectCoverageFrom` on `$SRC`.
 
-2. Full coverage run (json-summary). Use the repo’s existing test command if it already runs Jest or Vitest; add the coverage flags. Otherwise:
+2. Full coverage (json-summary). Always pass `collectCoverageFrom` for `$SRC` (minus styles/types) so a repo with almost no tests still produces `coverage/coverage-summary.json`.
 
 Jest:
 
 ```bash
-<pm> jest --watchman=false --coverage --coverageReporters=json-summary --coverageReporters=text-summary --forceExit
+<pm> jest --watchman=false --coverage --coverageReporters=json-summary --coverageReporters=text-summary --forceExit --collectCoverageFrom='<src>/**/*.{js,jsx,ts,tsx}'
 ```
 
 Vitest:
@@ -93,27 +130,27 @@ Vitest:
 <pm> vitest run --coverage --coverage.reporter=json-summary --coverage.reporter=text
 ```
 
-Write `coverage/coverage-summary.json`. If the tool puts it elsewhere, point `COVERAGE_SUMMARY` at it when running the gate.
+Use the repo's test script if it already runs Jest/Vitest; still require json-summary.
 
-3. `node .test-swarm/coverage-gate.cjs` — if PASS, stop and report before/after.
+3. `node .test-swarm/coverage-gate.cjs` — PASS: stop, report before/after to the user.
 
-4. If FAIL: `node .test-swarm/report-coverage.cjs`. Build or update `.test-swarm/units.tsv` from the report: one row per disjoint folder or large file. Prefer existing top-level folders under `$SRC`. Split a folder that is still huge.
+4. FAIL: `node .test-swarm/report-coverage.cjs`. Fill `units.tsv` — one disjoint folder (or huge file) per row. Prefer top-level folders under `$SRC`.
 
-5. Claim the next queued units whose `paths` do not overlap in-flight work: `.test-swarm/claim-slice.sh <id>`
+5. `.test-swarm/claim-slice.sh <id>` for the next free units.
 
-6. Spawn a worker per claimed unit. Prompt: `.test-swarm/worker.md` with base, paths, branch, worktree filled in. Inherit parent model.
+6. Spawn workers (see Spawn). Tell the user what started.
 
-7. When a worker reports done: if its glob is under 95/95, send the **same** worker back. Do not open a "good enough" PR. If at 95/95, they push and `gh pr create --base <base>`. Never merge.
+7. Worker done: under 95/95 → same worker back, tell the user why. At 95/95 → they push and `gh pr create --base <base>`. Never merge. Tell the user the PR link in product words.
 
-8. Repeat from step 2 until the gate passes. When the queue is empty and the gate is still red, add a new unit from the report's top uncovered files (new branch off base, new worktree). Never reuse an in-flight path.
+8. Repeat from step 2 until the gate passes. Empty queue and still red → new unit from top uncovered files. Never reuse an in-flight path.
 
 ## Slice rules
 
-- One writer per path. Never two workers on the same files.
-- Worktrees are siblings of the repo, named `<repo>-wt-<id>`. Symlink `node_modules` from the main repo.
-- Keep going after a PR is open. Do not wait for the human except merge (they merge nothing until they say so).
-- Skip denylist files. Tests live next to the product file in `__tests__/` or the repo's existing test layout.
+- One writer per path.
+- Worktrees are **siblings** of the app repo: `../<repo>-wt-<id>`. Symlink `node_modules` from the main repo. Do not run `yarn install` in every worktree if the symlink worked.
+- Keep going after a PR is open. Do not wait for merge.
+- Tests live in `__tests__/` or the repo's existing layout.
 
 ## Report when done
 
-Before vs after: lines % and branches % on the testable glob. List PR URLs. Name anything still skipped and why (untestable vs needs a product change).
+Before vs after, in the two percentages (lines = how much code ran; branches = how many yes/no paths ran). PR links. What was skipped and why (cannot unit-test vs needs a product change).
